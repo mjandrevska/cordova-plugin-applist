@@ -18,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 import android.os.Environment;
+import android.graphics.Canvas;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.BitmapDrawable;  
@@ -29,11 +30,29 @@ import java.util.HashSet;
 import java.util.Collections;
 
 public class Applist extends CordovaPlugin {
+
+    public static Bitmap drawableToBitmap(Drawable drawable){
+      try {
+          Bitmap bitmap;
+
+          bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+
+          Canvas canvas = new Canvas(bitmap);
+          drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+          drawable.draw(canvas);
+          return bitmap;
+      } catch (OutOfMemoryError e) {
+          // Handle the error
+          return null;
+      }
+    }
+
+
     public static void drawableTofile(Drawable drawable,String path)
     {
 
             File file = new File(path);
-            Bitmap bitmap=((BitmapDrawable)drawable).getBitmap();
+            Bitmap bitmap=drawableToBitmap(drawable);
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.PNG, 100 /*ignored for PNG*/, bos);
             byte[] bitmapdata = bos.toByteArray();
